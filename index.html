@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fred's Ranch & Resort — Hospitality Management Operating System 2026</title>
+  <style>
+    :root {
+      --olive: #3B4A1A;
+      --olive-mid: #4E6122;
+      --olive-pale: #8A9B5A;
+      --amber: #B5841A;
+      --amber-pale: #D4A83A;
+      --amber-tint: #FDF3DC;
+      --parchment: #F7F4EE;
+      --ink: #1C1C1A;
+      --ink-mid: #3A3A36;
+      --ink-light: #6E6E66;
+      --rule: #D8D3C8;
+      --white: #FFFFFF;
+      --bg-soft: rgba(59,74,26,0.06);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      background: var(--parchment);
+      color: var(--ink);
+      line-height: 1.65;
+    }
+    a { color: inherit; }
+    .page-wrap { display: flex; min-height: 100vh; }
+    .sidenav {
+      width: 220px; flex-shrink: 0; background: var(--olive); color: rgba(255,255,255,0.8);
+      padding: 2rem 0; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    }
+    .sidenav-logo { padding: 0 1.25rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.15); margin-bottom: 1.25rem; }
+    .sidenav-logo .brand { display: block; font-size: 1.1rem; font-weight: 700; color: var(--amber-pale); line-height: 1.25; }
+    .sidenav-logo .sub { display: block; margin-top: 0.25rem; font-family: Arial, sans-serif; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
+    .sidenav nav { display: grid; }
+    .sidenav nav .nav-section { font-family: Arial, sans-serif; font-size: 0.64rem; letter-spacing: 0.09em; text-transform: uppercase; color: rgba(255,255,255,0.38); padding: 1rem 1.25rem 0.35rem; }
+    .sidenav nav a { display: block; padding: 0.48rem 1.25rem; font-family: Arial, sans-serif; font-size: 0.72rem; text-decoration: none; color: rgba(255,255,255,0.7); border-left: 2px solid transparent; }
+    .sidenav nav a:hover, .sidenav nav a.active { border-left-color: var(--amber-pale); color: var(--amber-pale); background: rgba(255,255,255,0.05); }
+    .main { flex: 1; min-width: 0; max-width: 920px; }
+    .hero { background: var(--olive); color: var(--white); padding: 4rem 3rem 3rem; }
+    .hero-eyebrow { font-family: Arial, sans-serif; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--amber-pale); margin-bottom: 0.8rem; }
+    .hero h1 { margin: 0; font-size: clamp(2.1rem, 3vw, 3rem); line-height: 1.18; max-width: 680px; }
+    .hero h1 em { color: var(--amber-pale); font-style: italic; }
+    .hero p { max-width: 62ch; color: rgba(255,255,255,0.78); font-size: 1.05rem; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.75rem; }
+    .btn { display: inline-flex; padding: 0.75rem 1.2rem; text-decoration: none; font-family: Arial, sans-serif; font-size: 0.8rem; font-weight: 600; border-radius: 2px; }
+    .btn-amber { background: var(--amber); color: #fff; }
+    .btn-ghost { border: 1px solid rgba(255,255,255,0.3); color: #fff; }
+    .section { padding: 2.75rem 3rem; border-bottom: 1px solid var(--rule); }
+    .section h2 { margin: 0 0 0.5rem; font-size: 1.65rem; color: var(--olive); }
+    .section-rule { width: 42px; height: 3px; background: var(--amber); border: 0; margin: 0 0 1.35rem; }
+    .stats { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; }
+    .stat { background: var(--white); border: 1px solid var(--rule); padding: 1rem 1.1rem; }
+    .stat dt { font-family: Arial, sans-serif; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-light); }
+    .stat dd { margin: 0.35rem 0 0; font-family: Arial, sans-serif; font-size: 1.15rem; font-weight: 700; color: var(--olive); }
+    .loop { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 0.75rem; }
+    .loop article { background: var(--white); border: 1px solid var(--rule); padding: 0.9rem 1rem; }
+    .loop .n { font-family: Arial, sans-serif; font-size: 0.7rem; color: var(--amber); font-weight: 700; }
+    .chain { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; font-family: Arial, sans-serif; font-size: 0.75rem; }
+    .chip { background: var(--olive); color: #fff; padding: 0.4rem 0.7rem; }
+    table { width: 100%; border-collapse: collapse; background: var(--white); font-family: Arial, sans-serif; font-size: 0.8rem; }
+    th, td { border-bottom: 1px solid var(--rule); padding: 0.65rem 0.7rem; text-align: left; vertical-align: top; }
+    th { background: var(--olive); color: #fff; }
+    .legal-box { background: var(--amber-tint); border-left: 3px solid var(--amber); padding: 1rem 1.2rem; font-size: 0.95rem; }
+    .page-footer { background: var(--ink); color: rgba(255,255,255,0.65); padding: 2rem 3rem; font-family: Arial, sans-serif; font-size: 0.75rem; }
+    @media (max-width: 780px) {
+      .page-wrap { display: block; }
+      .sidenav { display: none; }
+      .hero, .section, .page-footer { padding-left: 1.4rem; padding-right: 1.4rem; }
+      .stats, .loop { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <aside class="sidenav">
+      <div class="sidenav-logo">
+        <span class="brand">Fred's Ranch<br>& Resort</span>
+        <span class="sub">HMOS Layer 2026</span>
+      </div>
+      <nav>
+        <span class="nav-section">This layer</span>
+        <a href="#proposition">Working proposition</a>
+        <a href="#loop">Control loop</a>
+        <a href="#architecture">Operating chain</a>
+        <a href="#propositions">Theory tests</a>
+        <a href="#implement">Implementation</a>
+        <span class="nav-section">Existing instruments</span>
+        <a href="frrbscexplainer.html">BSC Explainer</a>
+        <a href="governance.html">Governance Portal</a>
+        <a href="FRR_Operations_Manager_BSC_Evaluation_2026%20(1).xlsx">Evaluation Sheet (.xlsx)</a>
+      </nav>
+    </aside>
+    <main class="main">
+      <header class="hero" id="proposition">
+        <div class="hero-eyebrow">Hospitality Management Operating System · Layer added 2026</div>
+        <h1>From Balanced Scorecard to a hospitality <em>management operating system</em></h1>
+        <p>Hospitality performance improves when strategy is not left at the dashboard level, but translated into positions, controls, evidence, management action, and institutional memory.</p>
+        <div class="hero-actions">
+          <a class="btn btn-amber" href="frrbscexplainer.html">Open BSC framework</a>
+          <a class="btn btn-ghost" href="governance.html">Open governance portal</a>
+        </div>
+      </header>
+
+      <section class="section">
+        <h2>Enterprise control conditions</h2>
+        <hr class="section-rule" />
+        <dl class="stats">
+          <div class="stat"><dt>Enterprise revenue</dt><dd>KES 180M – 220M</dd></div>
+          <div class="stat"><dt>Gross profit target</dt><dd>≥ 58.86%</dd></div>
+          <div class="stat"><dt>EBITDA margin</dt><dd>≥ 22% – 25%</dd></div>
+          <div class="stat"><dt>Governance cycle</dt><dd>14 days → 2 hrs</dd></div>
+        </dl>
+      </section>
+
+      <section class="section" id="loop">
+        <h2>The core control loop</h2>
+        <hr class="section-rule" />
+        <p>Traditional question: did the department hit its target? System question: was the required operating condition established, evidenced, controlled, reviewed, corrected and institutionalized?</p>
+        <div class="loop">
+          <article><div class="n">01</div><strong>Expected condition</strong><br/>What operating condition must exist?</article>
+          <article><div class="n">02</div><strong>Actual evidence</strong><br/>What proves what happened?</article>
+          <article><div class="n">03</div><strong>Managerial control</strong><br/>What did the office cause, coordinate or escalate?</article>
+          <article><div class="n">04</div><strong>Result</strong><br/>What outcome was produced?</article>
+          <article><div class="n">05</div><strong>Evaluation</strong><br/>How does the result compare to the target?</article>
+          <article><div class="n">06</div><strong>Action / CAPA</strong><br/>What must change, by whom, by when?</article>
+          <article><div class="n">07</div><strong>Institutionalization</strong><br/>How does the lesson survive the individual?</article>
+        </div>
+      </section>
+
+      <section class="section" id="architecture">
+        <h2>Vertical operating chain</h2>
+        <hr class="section-rule" />
+        <p>The scorecard is placed above operational data but connected to it — a management layer on top of the daily operational-control engine.</p>
+        <div class="chain" style="margin: 1rem 0 1.5rem;">
+          <span class="chip">Engine</span> → <span class="chip">Teams</span> → <span class="chip">Shift Allocation</span> → <span class="chip">SOP</span> → <span class="chip">Evidence</span> → <span class="chip">Points</span> → <span class="chip">Balanced Scorecard</span> → <span class="chip">Management Action</span>
+        </div>
+        <table>
+          <thead><tr><th>Level</th><th>Function</th><th>Primary question</th></tr></thead>
+          <tbody>
+            <tr><td>Enterprise standard</td><td>Brand, strategy, financial and governance expectations.</td><td>What must the organization achieve?</td></tr>
+            <tr><td>Management system</td><td>BSC, control system and management rhythm.</td><td>How will management know whether the organization is under control?</td></tr>
+            <tr><td>Position / role</td><td>Authority, accountability, KRA and KPI.</td><td>Who is accountable for creating the required condition?</td></tr>
+            <tr><td>Department / process</td><td>SOP, workflow, handover and service flow.</td><td>How should the work occur?</td></tr>
+            <tr><td>Frontline execution</td><td>Shift, duty, transaction, service interaction.</td><td>What happened at the point of work?</td></tr>
+            <tr><td>Evidence</td><td>Register, checklist, audit, report, incident, system record.</td><td>What proves what happened?</td></tr>
+            <tr><td>Corrective action</td><td>Action, owner, due date, verification.</td><td>What must change?</td></tr>
+            <tr><td>Institutional memory</td><td>SOP update, training, control, escalation, knowledge record.</td><td>How does improvement survive the individual?</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="section" id="propositions">
+        <h2>HMOS as a hospitality theory</h2>
+        <hr class="section-rule" />
+        <div class="legal-box">
+          <strong>Proposed definition.</strong> The Hospitality Management Operating System (HMOS) is a role-based, evidence-gated management architecture that translates enterprise strategy into operational conditions, measures results, tests managerial control, coordinates cross-department dependencies, closes corrective actions and converts verified learning into institutional memory.
+        </div>
+        <table>
+          <thead><tr><th>ID</th><th>Theoretical statement</th><th>Observable test</th></tr></thead>
+          <tbody>
+            <tr><td>P1 Alignment</td><td>When strategic objectives are translated into role-specific control conditions, frontline activity should become more visibly connected to enterprise strategy.</td><td>Trace enterprise objective → role → process/shift → evidence.</td></tr>
+            <tr><td>P2 Evidence</td><td>When performance claims require identifiable evidence, unsupported or ambiguous scores should decline.</td><td>Measure % of KPI records with complete evidence.</td></tr>
+            <tr><td>P3 Control</td><td>When managerial evaluation distinguishes result from managerial control, accountability should become more precise.</td><td>Compare outcome-only appraisal with control-and-evidence appraisal.</td></tr>
+            <tr><td>P4 Coordination</td><td>When cross-department dependencies are explicit KPIs, unresolved bottlenecks should become more visible.</td><td>Track dependency closure time, repeat failures and escalations.</td></tr>
+            <tr><td>P5 Institutionalization</td><td>When corrective action must become a documented control, repeat failures should decline.</td><td>Measure recurrence after CAPA closure and re-audit.</td></tr>
+            <tr><td>P6 Learning</td><td>When evidence flows through a recurring rhythm, reusable management knowledge should accumulate.</td><td>Measure reuse of SOPs, audit findings, training and improvement records.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="section" id="implement">
+        <h2>Implementation sequence</h2>
+        <hr class="section-rule" />
+        <table>
+          <thead><tr><th>Step</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>01 Define the enterprise standard</td><td>Brand promise, strategic objectives, financial boundaries, compliance and service standards.</td></tr>
+            <tr><td>02 Define positions</td><td>Use positions rather than individuals as the durable units of accountability.</td></tr>
+            <tr><td>03 Build the KPI dictionary</td><td>For each KPI define target, direction, measurement method, evidence, frequency, owner and control test.</td></tr>
+            <tr><td>04 Connect daily work</td><td>Map SOPs, shifts, checklists, handovers and system transactions to the relevant KPI.</td></tr>
+            <tr><td>05 Establish the evidence gate</td><td>No identifiable evidence → incomplete record; do not silently convert missing evidence into a score.</td></tr>
+            <tr><td>06 Run the management rhythm</td><td>Daily evidence; weekly exception review; monthly evidence register; quarterly formal evaluation; annual appraisal.</td></tr>
+            <tr><td>07 Close the loop</td><td>Record variance, corrective action, verification and institutionalization.</td></tr>
+            <tr><td>08 Build the data layer</td><td>Integrate operational systems only after management definitions are stable.</td></tr>
+            <tr><td>09 Add analytics and AI</td><td>Introduce predictive and assistive functions after evidence quality and governance are reliable. AI assists; managers authorize.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <footer class="page-footer">
+        <p>Fred's Ranch & Resort · Hospitality Management Operating System · 2026</p>
+        <p>This layer sits on the existing Balanced Scorecard explainer and Operations Manager evaluation workbook. It does not amend employment terms. Claims of industry-wide impact remain hypotheses until measured longitudinally.</p>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>

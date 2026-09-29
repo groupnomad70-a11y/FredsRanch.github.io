@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fred's Ranch Resort - Governance & Operating Architecture Portal</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            950: '#070a0f',
+                            900: '#0b0f17',
+                            800: '#131b2a',
+                            700: '#1c283d',
+                            600: '#283854',
+                        },
+                        amberGold: {
+                            400: '#fbbf24',
+                            500: '#d9a03b',
+                            600: '#b78028',
+                        },
+                        emeraldCustom: {
+                            500: '#10b981',
+                            600: '#059669',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"DM Sans"', 'sans-serif'],
+                        mono: ['"DM Mono"', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: #0b0f17;
+            color: #e2e8f0;
+        }
+
+        .mono {
+            font-family: 'DM Mono', monospace;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f17;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1c283d;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d9a03b;
+        }
+
+        .amber-glow {
+            box-shadow: 0 0 15px rgba(217, 160, 59, 0.15);
+        }
+
+        .amber-border-glow:focus {
+            box-shadow: 0 0 10px rgba(217, 160, 59, 0.4);
+            border-color: #d9a03b;
+        }
+
+        /* Print CSS optimization */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            .bg-navy-900, .bg-navy-800, .bg-navy-950 {
+                background: white !important;
+                border: 1px solid #ccc !important;
+                color: black !important;
+            }
+            .text-white, .text-slate-300, .text-amberGold-400 {
+                color: black !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-navy-900 text-slate-200 min-h-screen flex flex-col justify-between antialiased selection:bg-amberGold-500 selection:text-navy-950">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-40 bg-navy-900/90 backdrop-blur-md border-b border-navy-700/60 px-4 lg:px-8 py-3.5">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amberGold-400 to-amberGold-600 flex items-center justify-center text-navy-950 font-bold text-xl shadow-lg">
+                        <i class="fa-solid font-bold fa-crown text-navy-950"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                            FRED'S RANCH RESORT
+                            <span class="text-xs font-mono font-medium bg-amberGold-500/20 text-amberGold-400 border border-amberGold-500/30 px-2 py-0.5 rounded-full">GOV-v2026.2</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Enterprise Governance, IP Framework & Operating Architecture</p>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Toggle Button -->
+                <button id="mobileMenuBtn" class="md:hidden text-slate-300 hover:text-white p-2 rounded-lg bg-navy-800 border border-navy-700">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Global Search & Actions -->
+            <div class="flex items-center space-x-3">
+                <div class="relative w-full md:w-80">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                    <input type="text" id="globalSearchInput" placeholder="Search staff, KPIs, SOP codes, IP rules..." 
+                           class="w-full bg-navy-950/80 border border-navy-700 text-xs text-slate-200 rounded-lg pl-9 pr-4 py-2 focus:outline-none amber-border-glow transition-all">
+                </div>
+                <button onclick="window.print()" class="no-print hidden sm:flex items-center space-x-1.5 px-3 py-2 text-xs bg-navy-800 hover:bg-navy-700 border border-navy-700 text-slate-300 hover:text-white rounded-lg transition">
+                    <i class="fa-solid fa-print"></i>
+                    <span>Print Report</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Navigation Bar (Tabs) -->
+    <nav class="bg-navy-950 border-b border-navy-800 px-4 lg:px-8 overflow-x-auto no-scrollbar">
+        <div class="max-w-7xl mx-auto flex space-x-1 min-w-max py-2" id="navigationTabs">
+            <button data-tab="tab-overview" class="nav-tab active flex items-center space-x-2 px-4 py-2 text-xs font-medium rounded-lg bg-amberGold-500 text-navy-950 font-semibold transition">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Executive Summary</span>
+            </button>
+            <button data-tab="tab-organogram" class="nav-tab flex items-center space-x-2 px-4 py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-slate-200 hover:bg-navy-800 transition">
+                <i class="fa-solid fa-sitemap"></i>
+                <span>Organogram & Staff Directory</span>
+            </button>
+            <button data-tab="tab-calculator" class="nav-tab flex items-center space-x-2 px-4 py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-slate-200 hover:bg-navy-800 transition">
+                <i class="fa-solid fa-calculator"></i>
+                <span>Financial & GP Margin Simulator</span>
+            </button>
+            <button data-tab="tab-ip-governance" class="nav-tab flex items-center space-x-2 px-4 py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-slate-200 hover:bg-navy-800 transition">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>IP Governance & Trade Secrets</span>
+            </button>
+            <button data-tab="tab-legal-form" class="nav-tab flex items-center space-x-2 px-4 py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-slate-200 hover:bg-navy-800 transition">
+                <i class="fa-solid fa-file-signature"></i>
+                <span>Legal Directive Generator (LA-01)</span>
+            </button>
+            <button data-tab="tab-sop-timeline" class="nav-tab flex items-center space-x-2 px-4 py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-slate-200 hover:bg-navy-800 transition">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>Daily SOP & Audit Trail</span>
+            </button>
+            <button data-tab="tab-workflow-studio" class="nav-tab flex items-center space-x-2 px-4 py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-slate-200 hover:bg-navy-800 transition">
+                <i class="fa-solid fa-diagram-project"></i>
+                <span>Performance Workflow Studio</span>
+            </button>
+            <button data-tab="tab-software-arch" class="nav-tab flex items-center space-x-2 px-4 py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-slate-200 hover:bg-navy-800 transition">
+                <i class="fa-solid fa-code flex-shrink-0"></i>
+                <span>Software & Android Engineering</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Content Area Container -->
+    <main class="max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 flex-grow space-y-6">
+
+        <!-- TAB 1: EXECUTIVE OVERVIEW -->
+        <section id="tab-overview" class="tab-content space-y-6">
+            
+            <!-- Hero Stats Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-navy-800/80 border border-navy-700/80 rounded-xl p-4 relative overflow-hidden amber-glow">
+                    <div class="flex items-center justify-between text-xs text-slate-400 font-medium">
+                        <span>Target Enterprise Revenue</span>
+                        <i class="fa-solid fa-coins text-amberGold-400"></i>
+                    </div>
+                    <div class="mt-2 text-2xl font-bold font-mono text-white">KES 180M - 220M</div>
+                    <div class="mt-2 flex items-center text-xs text-emeraldCustom-500 gap-1 font-medium">
+                        <i class="fa-solid fa-arrow-trend-up"></i>
+                        <span>Annual Target Target Allocation</span>
+                    </div>
+                </div>
+
+                <div class="bg-navy-800/80 border border-navy-700/80 rounded-xl p-4 relative overflow-hidden">
+                    <div class="flex items-center justify-between text-xs text-slate-400 font-medium">
+                        <span>Gross Profit (GP) Target</span>
+                        <i class="fa-solid fa-pie-chart text-emeraldCustom-500"></i>
+                    </div>
+                    <div class="mt-2 text-2xl font-bold font-mono text-white">≥ 58.86%</div>
+                    <div class="mt-2 flex items-center text-xs text-slate-400 gap-1">
+                        <span>F&B Cost Threshold: </span>
+                        <span class="text-amberGold-400 font-semibold font-mono">28.0% - 32.0%</span>
+                    </div>
+                </div>
+
+                <div class="bg-navy-800/80 border border-navy-700/80 rounded-xl p-4 relative overflow-hidden">
+                    <div class="flex items-center justify-between text-xs text-slate-400 font-medium">
+                        <span>Target EBITDA Margin</span>
+                        <i class="fa-solid fa-vault text-blue-400"></i>
+                    </div>
+                    <div class="mt-2 text-2xl font-bold font-mono text-white">≥ 22% - 25%</div>
+                    <div class="mt-2 flex items-center text-xs text-emeraldCustom-500 gap-1">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Operational Efficiency Cap</span>
+                    </div>
+                </div>
+
+                <div class="bg-navy-800/80 border border-navy-700/80 rounded-xl p-4 relative overflow-hidden">
+                    <div class="flex items-center justify-between text-xs text-slate-400 font-medium">
+                        <span>Governance Speedup</span>
+                        <i class="fa-solid fa-bolt text-amberGold-400"></i>
+                    </div>
+                    <div class="mt-2 text-2xl font-bold font-mono text-white">14 Days → 2 Hrs</div>
+                    <div class="mt-2 flex items-center text-xs text-slate-400 gap-1">
+                        <span>Redundant Layers Cut: </span>
+                        <span class="text-white font-semibold">3 Tiers</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Governance Improvements & Core Metrics Bar -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Strategic Highlights -->
+                <div class="lg:col-span-2 bg-navy-800/60 border border-navy-700/80 rounded-xl p-6">
+                    <div class="flex items-center justify-between pb-4 border-b border-navy-700">
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-chess-king text-amberGold-400"></i>
+                            Strategic Apex & Restructuring Impact
+                        </h2>
+                        <span class="px-2.5 py-1 bg-amberGold-500/10 text-amberGold-400 border border-amberGold-500/20 text-xs rounded-lg font-mono">Shift Log: Active</span>
+                    </div>
+
+                    <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-navy-900/80 border border-navy-700 p-3.5 rounded-lg">
+                            <div class="text-xs text-slate-400 font-medium">Culture Index</div>
+                            <div class="text-xl font-mono font-bold text-emeraldCustom-500 mt-1">≥ 90.0%</div>
+                            <p class="text-[11px] text-slate-400 mt-1">Staff discipline & operational compliance threshold.</p>
+                        </div>
+                        <div class="bg-navy-900/80 border border-navy-700 p-3.5 rounded-lg">
+                            <div class="text-xs text-slate-400 font-medium">Core Operating Roles</div>
+                            <div class="text-xl font-mono font-bold text-amberGold-400 mt-1">+3 Roles Filled</div>
+                            <p class="text-[11px] text-slate-400 mt-1">Night Mgr, Store Keeper, Barista Lead added.</p>
+                        </div>
+                        <div class="bg-navy-900/80 border border-navy-700 p-3.5 rounded-lg">
+                            <div class="text-xs text-slate-400 font-medium">Turnover Ceiling</div>
+                            <div class="text-xl font-mono font-bold text-blue-400 mt-1">≤ 10 - 12%</div>
+                            <p class="text-[11px] text-slate-400 mt-1">People & Culture retention mandate.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 space-y-3">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Key Governance Directives & Operating Imperatives</h3>
+                        <div class="space-y-2">
+                            <div class="flex items-start gap-3 p-3 bg-navy-950/60 rounded-lg border border-navy-700/50">
+                                <i class="fa-solid fa-shield text-amberGold-400 mt-0.5"></i>
+                                <div class="text-xs">
+                                    <span class="font-bold text-slate-200">Strict IP & Trade Secret Protocol:</span>
+                                    <span class="text-slate-400"> Protection of the core "Mbuzi Secret Spice Formulation" and marinade timing protocols under Form LA-03 and Protection Against Unfair Competition Act.</span>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3 p-3 bg-navy-950/60 rounded-lg border border-navy-700/50">
+                                <i class="fa-solid fa-clock text-blue-400 mt-0.5"></i>
+                                <div class="text-xs">
+                                    <span class="font-bold text-slate-200">Culinary Efficiency Guarantee:</span>
+                                    <span class="text-slate-400"> Kitchen wait time strictly enforced under Head Chef Kenneth Chepsoi to be ≤55 minutes per main order.</span>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3 p-3 bg-navy-950/60 rounded-lg border border-navy-700/50">
+                                <i class="fa-solid fa-file-invoice-dollar text-emeraldCustom-500 mt-0.5"></i>
+                                <div class="text-xs">
+                                    <span class="font-bold text-slate-200">Financial Variance Variance Limit:</span>
+                                    <span class="text-slate-400"> Daily audit standard monitored by CPA Chris Mutinda bound within tight ±2-5% variance toleration.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Executive Tier Quick Access Card -->
+                <div class="bg-navy-800/60 border border-navy-700/80 rounded-xl p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between pb-4 border-b border-navy-700">
+                            <h2 class="text-base font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-user-shield text-amberGold-400"></i>
+                                Strategic Leadership
+                            </h2>
+                            <span class="text-xs text-slate-400">Board Tier 1</span>
+                        </div>
+
+                        <div class="mt-4 space-y-3">
+                            <div class="flex items-center justify-between p-2.5 bg-navy-900/60 rounded-lg border border-navy-700/40">
+                                <div class="flex items-center space-x-2.5">
+                                    <div class="w-8 h-8 rounded-full bg-amberGold-500/20 text-amberGold-400 flex items-center justify-center font-bold text-xs">
+                                        FM
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white">Fred Obachi Machoka</div>
+                                        <div class="text-[10px] text-slate-400">Chairman - Governance & Brand</div>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] bg-navy-700 text-slate-300 px-2 py-0.5 rounded">Apex</span>
+                            </div>
+
+                            <div class="flex items-center justify-between p-2.5 bg-navy-900/60 rounded-lg border border-navy-700/40">
+                                <div class="flex items-center space-x-2.5">
+                                    <div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xs">
+                                        HN
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white">Hiram Nyingi</div>
+                                        <div class="text-[10px] text-slate-400">General Manager (Tier 2 Exec)</div>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] bg-emeraldCustom-500/20 text-emeraldCustom-500 border border-emeraldCustom-500/30 px-2 py-0.5 rounded">Active</span>
+                            </div>
+
+                            <div class="flex items-center justify-between p-2.5 bg-navy-900/60 rounded-lg border border-navy-700/40">
+                                <div class="flex items-center space-x-2.5">
+                                    <div class="w-8 h-8 rounded-full bg-emeraldCustom-500/20 text-emeraldCustom-500 flex items-center justify-center font-bold text-xs">
+                                        CM
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white">CPA Chris Mutinda</div>
+                                        <div class="text-[10px] text-slate-400">Chief Accountant</div>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] bg-emeraldCustom-500/20 text-emeraldCustom-500 border border-emeraldCustom-500/30 px-2 py-0.5 rounded">Active</span>
+                            </div>
+
+                            <div class="flex items-center justify-between p-2.5 bg-navy-900/60 rounded-lg border border-navy-700/40">
+                                <div class="flex items-center space-x-2.5">
+                                    <div class="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-xs">
+                                        RO
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white">Reagan Ogol</div>
+                                        <div class="text-[10px] text-slate-400">Operations Manager</div>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] bg-emeraldCustom-500/20 text-emeraldCustom-500 border border-emeraldCustom-500/30 px-2 py-0.5 rounded">Active</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="switchTab('tab-organogram')" class="w-full mt-4 py-2 bg-navy-700 hover:bg-navy-600 border border-navy-600 text-xs font-semibold text-slate-200 rounded-lg transition flex items-center justify-center gap-2">
+                        <span>View Full Interactive Organogram</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: ORGANOGRAM & STAFF DIRECTORY -->
+        <section id="tab-organogram" class="tab-content hidden space-y-6">
+            <!-- Filter Controls -->
+            <div class="bg-navy-800/80 border border-navy-700 p-4 rounded-xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-base font-bold text-white">Organizational Hierarchy & Directory</h2>
+                    <p class="text-xs text-slate-400">3-Tier Delegated Structure with Role-Specific KPIs</p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                    <button class="tier-filter-btn active px-3 py-1.5 rounded-lg text-xs font-medium bg-amberGold-500 text-navy-950 font-semibold" data-filter="all">All Tiers</button>
+                    <button class="tier-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-navy-950 text-slate-300 border border-navy-700 hover:border-amberGold-500/50" data-filter="tier1">Tier 1: Board</button>
+                    <button class="tier-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-navy-950 text-slate-300 border border-navy-700 hover:border-amberGold-500/50" data-filter="tier2">Tier 2: Executive</button>
+                    <button class="tier-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-navy-950 text-slate-300 border border-navy-700 hover:border-amberGold-500/50" data-filter="tier3">Tier 3: Operations</button>
+                </div>
+            </div>
+
+            <!-- Directory Cards Container -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="staffDirectoryContainer">
+                <!-- Javascript will render staff items dynamically here -->
+            </div>
+        </section>
+
+        <!-- TAB 3: GP MARGIN & FINANCIAL CALCULATOR -->
+        <section id="tab-calculator" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Calculator Input Form -->
+                <div class="lg:col-span-1 bg-navy-800/80 border border-navy-700 rounded-xl p-6 space-y-4">
+                    <div class="border-b border-navy-700 pb-3">
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-calculator text-amberGold-400"></i>
+                            Menu Recipe Margin Simulator
+                        </h2>
+                        <p class="text-xs text-slate-400">Verify recipe viability against enterprise margin benchmarks.</p>
+                    </div>
+
+                    <form id="calcForm" onsubmit="event.preventDefault(); calculateMargins();" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Item / Dish Name</label>
+                            <input type="text" id="calcItemName" value="Signature Mbuzi Choma Platter" 
+                                   class="w-full bg-navy-950 border border-navy-700 rounded-lg px-3 py-2 text-xs text-white amber-border-glow">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Raw Ingredient Cost (KES)</label>
+                            <input type="number" id="calcCost" value="850" step="10" 
+                                   class="w-full bg-navy-950 border border-navy-700 rounded-lg px-3 py-2 text-xs font-mono text-white amber-border-glow">
+                            <p class="text-[10px] text-slate-500 mt-1">Includes meat, secret marinade, sides & garnishes.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Selling Menu Price (KES)</label>
+                            <input type="number" id="calcPrice" value="2800" step="50" 
+                                   class="w-full bg-navy-950 border border-navy-700 rounded-lg px-3 py-2 text-xs font-mono text-white amber-border-glow">
+                        </div>
+
+                        <button type="button" onclick="calculateMargins()" 
+                                class="w-full py-2.5 bg-amberGold-500 hover:bg-amberGold-600 text-navy-950 font-bold text-xs rounded-lg transition shadow-md">
+                            Run Margin Analysis
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Simulation Output Panel -->
+                <div class="lg:col-span-2 bg-navy-800/80 border border-navy-700 rounded-xl p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between pb-4 border-b border-navy-700">
+                            <h3 class="text-sm font-bold text-white">Live Compliance Evaluation</h3>
+                            <span id="calcStatusBadge" class="px-2.5 py-1 text-xs rounded-full font-bold bg-emeraldCustom-500/20 text-emeraldCustom-500 border border-emeraldCustom-500/30">
+                                COMPLIANT
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6">
+                            <div class="bg-navy-950 p-4 rounded-xl border border-navy-700">
+                                <div class="text-xs text-slate-400">Gross Margin (GP %)</div>
+                                <div id="calcGpResult" class="text-2xl font-bold font-mono text-emeraldCustom-500 mt-1">69.64%</div>
+                                <div class="text-[10px] text-slate-500 mt-1">Target: ≥ 58.86%</div>
+                            </div>
+
+                            <div class="bg-navy-950 p-4 rounded-xl border border-navy-700">
+                                <div class="text-xs text-slate-400">F&B Cost Ratio</div>
+                                <div id="calcCostRatioResult" class="text-2xl font-bold font-mono text-amberGold-400 mt-1">30.36%</div>
+                                <div class="text-[10px] text-slate-500 mt-1">Limit: ≤ 28% - 32%</div>
+                            </div>
+
+                            <div class="bg-navy-950 p-4 rounded-xl border border-navy-700">
+                                <div class="text-xs text-slate-400">Contribution Margin</div>
+                                <div id="calcContributionResult" class="text-2xl font-bold font-mono text-white mt-1">KES 1,950</div>
+                                <div class="text-[10px] text-slate-500 mt-1">Per Unit Net Gain</div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar Visualizers -->
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-slate-300 font-medium">Gross Profit Target Scale (Min: 58.86%)</span>
+                                    <span id="calcGpLabel" class="font-mono text-emeraldCustom-500">69.6%</span>
+                                </div>
+                                <div class="w-full bg-navy-950 rounded-full h-2.5 overflow-hidden border border-navy-700">
+                                    <div id="calcGpBar" class="bg-emeraldCustom-500 h-2.5 rounded-full transition-all duration-500" style="width: 69.6%"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-slate-300 font-medium">F&B Cost Ceiling Scale (Max: 32.0%)</span>
+                                    <span id="calcCostLabel" class="font-mono text-amberGold-400">30.4%</span>
+                                </div>
+                                <div class="w-full bg-navy-950 rounded-full h-2.5 overflow-hidden border border-navy-700">
+                                    <div id="calcCostBar" class="bg-amberGold-500 h-2.5 rounded-full transition-all duration-500" style="width: 30.4%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-navy-950/80 border border-navy-700 rounded-lg text-xs text-slate-400">
+                        <span class="font-bold text-slate-200">Policy Note:</span> Recipe changes violating the 58.86% GP margin benchmark require prior authorization from Managing Director <span class="text-amberGold-400 font-semibold">Victor Keari Machoka</span> and Chief Accountant <span class="text-amberGold-400 font-semibold">CPA Chris Mutinda</span> via Legal Directive Form LA-01.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: IP GOVERNANCE & TRADE SECRETS -->
+        <section id="tab-ip-governance" class="tab-content hidden space-y-6">
+            <div class="bg-navy-800/80 border border-navy-700 rounded-xl p-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-navy-700 gap-2">
+                    <div>
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-shield-halved text-amberGold-400"></i>
+                            Intellectual Property & Legal Protection Architecture
+                        </h2>
+                        <p class="text-xs text-slate-400">Statutory Frameworks: Protection Against Unfair Competition Act & Copyright Act, 2001 Kenya</p>
+                    </div>
+                    <span class="px-3 py-1 bg-amberGold-500/10 text-amberGold-400 border border-amberGold-500/30 text-xs font-mono rounded-lg">
+                        Legal Director: Linda Machoka
+                    </span>
+                </div>
+
+                <!-- IP Control Pillars -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                    <div class="bg-navy-950 border border-navy-700 rounded-xl p-4 space-y-2">
+                        <div class="flex items-center space-x-2 text-amberGold-400">
+                            <i class="fa-solid fa-lock text-sm"></i>
+                            <h3 class="text-xs font-bold uppercase tracking-wider">Trade Secrets & Secret Sauces</h3>
+                        </div>
+                        <p class="text-xs text-slate-300">Protected under Protection Against Unfair Competition Act.</p>
+                        <ul class="text-[11px] text-slate-400 space-y-1 pl-4 list-disc">
+                            <li>Secret Spice Formulation & Marinade Ratios</li>
+                            <li>Marinade timing & meat aging cycles</li>
+                            <li>BOH Non-Disclosure Agreement Form LA-03</li>
+                            <li>Sous Chef Brian Mwangi recipe protection protocol</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-navy-950 border border-navy-700 rounded-xl p-4 space-y-2">
+                        <div class="flex items-center space-x-2 text-blue-400">
+                            <i class="fa-solid fa-copyright text-sm"></i>
+                            <h3 class="text-xs font-bold uppercase tracking-wider">Literary & Digital Copyright</h3>
+                        </div>
+                        <p class="text-xs text-slate-300">Protected under Copyright Act, 2001 (Kenya).</p>
+                        <ul class="text-[11px] text-slate-400 space-y-1 pl-4 list-disc">
+                            <li>Kotlin Android App Source Code</li>
+                            <li>SOP Manuals (FO-001, OPM-DAILY-001)</li>
+                            <li>Brand Photography & Marketing Collateral</li>
+                            <li>Training Curricula & Audit Checklists</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-navy-950 border border-navy-700 rounded-xl p-4 space-y-2">
+                        <div class="flex items-center space-x-2 text-emeraldCustom-500">
+                            <i class="fa-solid fa-file-contract text-sm"></i>
+                            <h3 class="text-xs font-bold uppercase tracking-wider">Work-for-Hire Assignment</h3>
+                        </div>
+                        <p class="text-xs text-slate-300">Automatic Ownership Clause in standard employment contracts.</p>
+                        <ul class="text-[11px] text-slate-400 space-y-1 pl-4 list-disc">
+                            <li>100% automatic IP transfer to Resort</li>
+                            <li>Innovations developed during employment</li>
+                            <li>Custom culinary presentation techniques</li>
+                            <li>Operational software scripts & configurations</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Asset Register Table -->
+                <div class="mt-8 space-y-3">
+                    <h3 class="text-xs font-bold text-white uppercase tracking-wider">Core IP Asset Register & Security Hash Status</h3>
+                    <div class="overflow-x-auto border border-navy-700 rounded-lg">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-navy-950 text-slate-400 font-mono text-[11px] uppercase border-b border-navy-700">
+                                <tr>
+                                    <th class="p-3">Asset ID</th>
+                                    <th class="p-3">Asset Classification</th>
+                                    <th class="p-3">Legal Framework</th>
+                                    <th class="p-3">Designated Custodian</th>
+                                    <th class="p-3">Access Hash Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-navy-700/60 bg-navy-900/40 font-mono text-[11px]">
+                                <tr>
+                                    <td class="p-3 text-amberGold-400 font-bold">IP-TS-001</td>
+                                    <td class="p-3 font-sans font-medium text-white">Mbuzi Secret Marinade & Spice Ratio</td>
+                                    <td class="p-3 text-slate-400">Trade Secret (Unfair Comp. Act)</td>
+                                    <td class="p-3 text-slate-200">Brian Mwangi / Julius Kyalo</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 bg-emeraldCustom-500/10 text-emeraldCustom-500 rounded border border-emeraldCustom-500/20">SHA256: 8f9a...3e12</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 text-amberGold-400 font-bold">IP-CP-002</td>
+                                    <td class="p-3 font-sans font-medium text-white">Android Kotlin POS & Audit Source Code</td>
+                                    <td class="p-3 text-slate-400">Copyright Act 2001 (Kenya)</td>
+                                    <td class="p-3 text-slate-200">Software Engineering Team</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 bg-emeraldCustom-500/10 text-emeraldCustom-500 rounded border border-emeraldCustom-500/20">SHA256: 4c2b...90d1</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 text-amberGold-400 font-bold">IP-SOP-003</td>
+                                    <td class="p-3 font-sans font-medium text-white">Resort Operations Manual & Audit Manuals</td>
+                                    <td class="p-3 text-slate-400">Literary Copyright / Enterprise SOP</td>
+                                    <td class="p-3 text-slate-200">Reagan Ogol (Operations Mgr)</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 bg-emeraldCustom-500/10 text-emeraldCustom-500 rounded border border-emeraldCustom-500/20">SHA256: a110...77f3</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 text-amberGold-400 font-bold">IP-TM-004</td>
+                                    <td class="p-3 font-sans font-medium text-white">Fred's Ranch Brand Assets & Media Rights</td>
+                                    <td class="p-3 text-slate-400">Trademark & Media Governance</td>
+                                    <td class="p-3 text-slate-200">Angel Omari Machoka</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 bg-emeraldCustom-500/10 text-emeraldCustom-500 rounded border border-emeraldCustom-500/20">SHA256: e87c...11b8</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: LEGAL DIRECTIVE GENERATOR (FORM LA-01) -->
+        <section id="tab-legal-form" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Form Inputs -->
+                <div class="bg-navy-800/80 border border-navy-700 rounded-xl p-6 space-y-4">
+                    <div class="border-b border-navy-700 pb-3">
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-file-signature text-amberGold-400"></i>
+                            Board Authority Sign-Off Generator (Form LA-01)
+                        </h2>
+                        <p class="text-xs text-slate-400">Issue binding legal directives for operational or pricing changes.</p>
+                    </div>
+
+                    <form id="la01Form" onsubmit="event.preventDefault(); generateDirective();" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Directive Reference Number</label>
+                            <input type="text" id="laRef" value="LA-01-2026-089" readonly 
+                                   class="w-full bg-navy-950/50 border border-navy-700 rounded-lg px-3 py-2 text-xs font-mono text-amberGold-400">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Directive Subject / Policy Modification</label>
+                            <input type="text" id="laSubject" value="Special Event Menu Pricing & Secret Spice Marinade Batch Authorization" 
+                                   class="w-full bg-navy-950 border border-navy-700 rounded-lg px-3 py-2 text-xs text-white amber-border-glow">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1">Authorizing Director</label>
+                                <select id="laDirector" class="w-full bg-navy-950 border border-navy-700 rounded-lg px-3 py-2 text-xs text-white amber-border-glow">
+                                    <option value="Linda Machoka (Legal & Statutory Director)">Linda Machoka (Legal)</option>
+                                    <option value="Victor Keari Machoka (Managing Director)">Victor Keari Machoka (MD)</option>
+                                    <option value="Fred Obachi Machoka (Chairman)">Fred Obachi Machoka (Chairman)</option>
+                                    <option value="Sophie Namuyonga (Vice-Chairlady)">Sophie Namuyonga (Audit Chair)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1">Target Department</label>
+                                <select id="laDept" class="w-full bg-navy-950 border border-navy-700 rounded-lg px-3 py-2 text-xs text-white amber-border-glow">
+                                    <option value="Kitchen Brigade & Culinary Ops">Kitchen Brigade</option>
+                                    <option value="Finance & Accounts">Finance & Accounts</option>
+                                    <option value="Food & Beverage Service">F&B Service</option>
+                                    <option value="Front Office & Housekeeping">Front Office</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Legal Mandate & Conditions</label>
+                            <textarea id="laDetails" rows="3" class="w-full bg-navy-950 border border-navy-700 rounded-lg px-3 py-2 text-xs text-white amber-border-glow">Authorized in compliance with Kenya Protection Against Unfair Competition Act. Ensures recipe secrecy Form LA-03 remaining intact with minimum 58.86% GP margin compliance.</textarea>
+                        </div>
+
+                        <button type="button" onclick="generateDirective()" 
+                                class="w-full py-2.5 bg-amberGold-500 hover:bg-amberGold-600 text-navy-950 font-bold text-xs rounded-lg transition shadow-md">
+                            Generate Authorized Directive
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Live Document Preview -->
+                <div class="bg-navy-800/80 border border-navy-700 rounded-xl p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between pb-3 border-b border-navy-700">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Live Document Preview</h3>
+                            <span class="text-[10px] font-mono bg-navy-950 text-emeraldCustom-500 px-2 py-0.5 rounded border border-navy-700">SHA-256 Validated</span>
+                        </div>
+
+                        <!-- Formal Directive Sheet -->
+                        <div id="directivePreviewSheet" class="mt-4 p-6 bg-navy-950 border border-navy-700 rounded-xl space-y-4 font-mono text-xs text-slate-300">
+                            <div class="text-center border-b border-navy-800 pb-3">
+                                <div class="text-amberGold-400 font-bold text-sm">FRED'S RANCH RESORT</div>
+                                <div class="text-[10px] text-slate-500">EXECUTIVE BOARD LEGAL DIRECTIVE - FORM LA-01</div>
+                            </div>
+
+                            <div class="flex justify-between text-[11px]">
+                                <div><span class="text-slate-500">REF:</span> <span id="previewRef" class="text-white">LA-01-2026-089</span></div>
+                                <div><span class="text-slate-500">DATE:</span> <span id="previewDate" class="text-white">2026-09-29</span></div>
+                            </div>
+
+                            <div>
+                                <div class="text-slate-500 text-[10px]">SUBJECT:</div>
+                                <div id="previewSubject" class="text-white font-bold font-sans text-xs">Special Event Menu Pricing & Secret Spice Marinade Batch Authorization</div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 text-[11px] bg-navy-900/60 p-2.5 rounded border border-navy-800">
+                                <div><span class="text-slate-500">AUTHORITY:</span> <div id="previewDirector" class="text-amberGold-400 font-sans font-medium">Linda Machoka</div></div>
+                                <div><span class="text-slate-500">DEPT:</span> <div id="previewDept" class="text-slate-200 font-sans">Kitchen Brigade</div></div>
+                            </div>
+
+                            <div>
+                                <div class="text-slate-500 text-[10px]">OPERATIONAL MANDATE:</div>
+                                <div id="previewDetails" class="text-slate-300 text-[11px] leading-relaxed font-sans pt-1">Authorized in compliance with Kenya Protection Against Unfair Competition Act. Ensures recipe secrecy Form LA-03 remaining intact with minimum 58.86% GP margin compliance.</div>
+                            </div>
+
+                            <div class="pt-4 border-t border-navy-800 flex items-end justify-between">
+                                <div class="text-[9px] text-slate-500">
+                                    <div>DIGITAL SIGNATURE HASH:</div>
+                                    <div id="previewHash" class="font-mono text-emeraldCustom-500">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</div>
+                                </div>
+                                <div class="px-3 py-1 bg-amberGold-500/10 border border-amberGold-500/30 text-amberGold-400 font-bold text-[10px] rounded">
+                                    VERIFIED
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 flex gap-3">
+                        <button onclick="copyDirectiveText()" class="flex-1 py-2 bg-navy-700 hover:bg-navy-600 border border-navy-600 text-xs font-semibold text-slate-200 rounded-lg transition">
+                            <i class="fa-solid fa-copy mr-1"></i> Copy Directive
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 6: DAILY SOP TIMELINE & AUDIT TRAIL -->
+        <section id="tab-sop-timeline" class="tab-content hidden space-y-6">
+            <div class="bg-navy-800/80 border border-navy-700 rounded-xl p-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-navy-700 gap-2">
+                    <div>
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-clock-rotate-left text-amberGold-400"></i>
+                            Daily SOP Operational Schedule & Shift Signals
+                        </h2>
+                        <p class="text-xs text-slate-400">Strict Shift Log Checkpoints & Daily BSC Execution Flow</p>
+                    </div>
+                    <span class="px-3 py-1 bg-emeraldCustom-500/10 text-emeraldCustom-500 border border-emeraldCustom-500/30 text-xs font-mono rounded-lg">
+                        Daily Audit Target: ±2-5% Variance
+                    </span>
+                </div>
+
+                <!-- Timeline Milestones -->
+                <div class="mt-6 space-y-6 relative before:absolute before:inset-0 before:left-3.5 before:w-0.5 before:bg-navy-700">
+
+                    <!-- Event 1 -->
+                    <div class="relative flex items-start space-x-4 pl-10">
+                        <div class="absolute left-0 top-0.5 w-7 h-7 rounded-full bg-amberGold-500 text-navy-950 font-bold flex items-center justify-center text-xs shadow-lg">
+                            <i class="fa-solid fa-bolt text-[10px]"></i>
+                        </div>
+                        <div class="bg-navy-950 border border-navy-700 rounded-xl p-4 flex-1">
+                            <div class="flex items-center justify-between">
+                                <span class="font-mono text-xs text-amberGold-400 font-bold">T-45 MIN (Pre-Shift Prep)</span>
+                                <span class="text-[10px] bg-navy-800 text-slate-400 px-2 py-0.5 rounded border border-navy-700">Duty Supervisor</span>
+                            </div>
+                            <h3 class="text-xs font-bold text-white mt-1">Audit Fetch & Stock Baselines</h3>
+                            <p class="text-xs text-slate-400 mt-1">Fetch Form FO-001, verify log OPM-DAILY-001, and confirm baseline Mbuzi goat count before opening.</p>
+                        </div>
+                    </div>
+
+                    <!-- Event 2 -->
+                    <div class="relative flex items-start space-x-4 pl-10">
+                        <div class="absolute left-0 top-0.5 w-7 h-7 rounded-full bg-blue-500 text-white font-bold flex items-center justify-center text-xs shadow-lg">
+                            <i class="fa-solid fa-comments text-[10px]"></i>
+                        </div>
+                        <div class="bg-navy-950 border border-navy-700 rounded-xl p-4 flex-1">
+                            <div class="flex items-center justify-between">
+                                <span class="font-mono text-xs text-blue-400 font-bold">T-15 MIN (Shift Briefing)</span>
+                                <span class="text-[10px] bg-navy-800 text-slate-400 px-2 py-0.5 rounded border border-navy-700">Duty Supervisor + Service Brigade</span>
+                            </div>
+                            <h3 class="text-xs font-bold text-white mt-1">Target Setting & FO-001 Countersign</h3>
+                            <p class="text-xs text-slate-400 mt-1">Confirm Mbuzi + platter upsell targets. Countersign FO-001. Check grooming standards.</p>
+                        </div>
+                    </div>
+
+                    <!-- Event 3 -->
+                    <div class="relative flex items-start space-x-4 pl-10">
+                        <div class="absolute left-0 top-0.5 w-7 h-7 rounded-full bg-emeraldCustom-500 text-navy-950 font-bold flex items-center justify-center text-xs shadow-lg">
+                            <i class="fa-solid fa-cash-register text-[10px]"></i>
+                        </div>
+                        <div class="bg-navy-950 border border-navy-700 rounded-xl p-4 flex-1">
+                            <div class="flex items-center justify-between">
+                                <span class="font-mono text-xs text-emeraldCustom-500 font-bold">15:00 HRS (Shift 1 Close)</span>
+                                <span class="text-[10px] bg-navy-800 text-slate-400 px-2 py-0.5 rounded border border-navy-700">Supervisor + Operations Manager</span>
+                            </div>
+                            <h3 class="text-xs font-bold text-white mt-1">Mid-Day POS Audit & Shift Switch</h3>
+                            <p class="text-xs text-slate-400 mt-1">Complete OPM-DAILY-001 closeout. Reconcile POS cash register against Stanley Tonui cashier log.</p>
+                        </div>
+                    </div>
+
+                    <!-- Event 4 -->
+                    <div class="relative flex items-start space-x-4 pl-10">
+                        <div class="absolute left-0 top-0.5 w-7 h-7 rounded-full bg-purple-500 text-white font-bold flex items-center justify-center text-xs shadow-lg">
+                            <i class="fa-solid fa-moon text-[10px]"></i>
+                        </div>
+                        <div class="bg-navy-950 border border-navy-700 rounded-xl p-4 flex-1">
+                            <div class="flex items-center justify-between">
+                                <span class="font-mono text-xs text-purple-400 font-bold">23:00 HRS (Shift 2 Night Close)</span>
+                                <span class="text-[10px] bg-navy-800 text-slate-400 px-2 py-0.5 rounded border border-navy-700">Night Manager Deedan Barasa + Audit</span>
+                            </div>
+                            <h3 class="text-xs font-bold text-white mt-1">Night Audit & Beverage Reconciliation</h3>
+                            <p class="text-xs text-slate-400 mt-1">Conduct night audit lock down. Reconcile store stock under Maclee Onkoba with beverage logs.</p>
+                        </div>
+                    </div>
+
+                    <!-- Event 5 -->
+                    <div class="relative flex items-start space-x-4 pl-10">
+                        <div class="absolute left-0 top-0.5 w-7 h-7 rounded-full bg-amberGold-400 text-navy-950 font-bold flex items-center justify-center text-xs shadow-lg">
+                            <i class="fa-solid fa-paper-plane text-[10px]"></i>
+                        </div>
+                        <div class="bg-navy-950 border border-navy-700 rounded-xl p-4 flex-1">
+                            <div class="flex items-center justify-between">
+                                <span class="font-mono text-xs text-amberGold-400 font-bold">07:00 HRS NEXT DAY</span>
+                                <span class="text-[10px] bg-navy-800 text-slate-400 px-2 py-0.5 rounded border border-navy-700">Operations Mgr → General Mgr</span>
+                            </div>
+                            <h3 class="text-xs font-bold text-white mt-1">Consolidated Morning Brief Transmittal</h3>
+                            <p class="text-xs text-slate-400 mt-1">Reagan Ogol transmits consolidated signal brief to GM Hiram Nyingi for morning Balanced Scorecard review.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 7: SOFTWARE & ANDROID ENGINEERING -->
+        <section id="tab-software-arch" class="tab-content hidden space-y-6">
+            <div class="bg-navy-800/80 border border-navy-700 rounded-xl p-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-navy-700 gap-2">
+                    <div>
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-code text-amberGold-400"></i>
+                            Digital POS & Offline Audit Android Stack Specs
+                        </h2>
+                        <p class="text-xs text-slate-400">Kotlin / Room Database / SHA-256 Recipe Cryptography Architecture</p>
+                    </div>
+                    <span class="px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/30 text-xs font-mono rounded-lg">
+                        Architecture: Offline-First SQLite
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                    <!-- Kotlin Specs Detail -->
+                    <div class="space-y-4">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Technical Android Framework Specifications</h3>
+                        <div class="space-y-3">
+                            <div class="p-3.5 bg-navy-950 rounded-lg border border-navy-700">
+                                <div class="text-xs font-bold text-amberGold-400 flex items-center gap-2">
+                                    <i class="fa-brands fa-android"></i> Kotlin Native Core Stack
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1">Built using Jetpack Compose UI, Coroutines for asynchronous audit tasks, and Hilt dependency injection.</p>
+                            </div>
+
+                            <div class="p-3.5 bg-navy-950 rounded-lg border border-navy-700">
+                                <div class="text-xs font-bold text-blue-400 flex items-center gap-2">
+                                    <i class="fa-solid fa-database"></i> Offline-First SQLite Room DB
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1">Ensures 100% operational uptime in rural resort environments. Logs sales locally and syncs to cloud on network restoration.</p>
+                            </div>
+
+                            <div class="p-3.5 bg-navy-950 rounded-lg border border-navy-700">
+                                <div class="text-xs font-bold text-emeraldCustom-500 flex items-center gap-2">
+                                    <i class="fa-solid fa-key"></i> SHA-256 Recipe Access Logging
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1">Every attempt to view confidential recipe quantities generates a cryptographic audit hash tied to the staff member's credentials.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Code Snippet Display -->
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">Recipe Protection Entity (Kotlin/Room)</h3>
+                        <div class="bg-navy-950 border border-navy-700 rounded-xl p-4 font-mono text-[11px] text-slate-300 overflow-x-auto">
+<pre class="text-emeraldCustom-400"><span class="text-purple-400">@Entity</span>(tableName = <span class="text-amberGold-400">"recipe_audit_logs"</span>)
+<span class="text-blue-400">data class</span> RecipeAuditLog(
+    <span class="text-purple-400">@PrimaryKey</span>(autoGenerate = <span class="text-amberGold-400">true</span>)
+    <span class="text-blue-400">val</span> logId: Long = 0,
+    <span class="text-blue-400">val</span> staffPinHash: String,
+    <span class="text-blue-400">val</span> recipeId: String,
+    <span class="text-blue-400">val</span> accessTimestamp: Long = System.currentTimeMillis(),
+    <span class="text-blue-400">val</span> deviceSha256Signature: String,
+    <span class="text-blue-400">val</span> gpMarginValidated: Boolean
+)
+
+<span class="text-purple-400">@Dao</span>
+<span class="text-blue-400">interface</span> RecipeAuditDao {
+    <span class="text-purple-400">@Insert</span>
+    <span class="text-blue-400">suspend fun</span> logRecipeAccess(log: RecipeAuditLog)
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- TAB 8: PERFORMANCE WORKFLOW STUDIO -->
+        <section id="tab-workflow-studio" class="tab-content hidden space-y-6">
+            <div class="bg-navy-800/80 border border-navy-700 rounded-xl p-6">
+                <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 pb-5 border-b border-navy-700">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-diagram-project text-amberGold-400"></i>
+                            Performance Workflow Studio
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">
+                            Select one menu item, focus on one role/KPI, then move through a controlled chain of forms from definition to evidence, review and closure.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2.5 py-1 rounded-lg bg-amberGold-500/10 border border-amberGold-500/30 text-amberGold-400 text-[10px] font-mono">ROLE-BASED</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-[10px] font-mono">EVIDENCE-GATED</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-emeraldCustom-500/10 border border-emeraldCustom-500/30 text-emeraldCustom-500 text-[10px] font-mono">CLOSURE</span>
+                    </div>
+                </div>
+
+                <!-- Menu Focus -->
+                <div class="mt-5 grid grid-cols-1 lg:grid-cols-4 gap-3">
+                    <div class="lg:col-span-1">
+                        <label class="block text-[10px] uppercase tracking-wider text-slate-400 mb-1">1. Menu item / workflow</label>
+                        <select id="wfMenu" onchange="wfMenuChanged()" class="w-full bg-navy-950 border border-navy-700 rounded-lg px-3 py-2.5 text-xs text-white">
+                            <option value="bsc">Balanced Scorecard KPI</option>
+                            <option value="sop">SOP / Compliance Control</option>
+                            <option value="audit">Operational Audit</option>
+                            <option value="incident">Safety / Service Incident</option>
+                            <option value="menu">Menu Item / Recipe Margin</option>
+                            <option value="directive">Legal / Governance Directive</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider text-slate-400 mb-1">2. Position</label>
+                        <select id="wfRole" onchange="wfRoleChanged()" class="w-full bg-navy-950 border border-navy-700 rounded-lg px-3 py-2.5 text-xs text-white">
+                            <option value="General Manager">General Manager</option>
+                            <option value="Operations Manager" selected>Operations Manager</option>
+                            <option value="People & Culture Manager">People & Culture Manager</option>
+                            <option value="Finance Manager">Finance Manager</option>
+                            <option value="Facilities Manager">Facilities Manager</option>
+                            <option value="Event Manager">Event Manager</option>
+                            <option value="ICT Manager">ICT Manager</option>
+                            <option value="Systems Admin">Systems Admin</option>
+                            <option value="Head Chef">Head Chef</option>
+                            <option value="Role Placeholder">[POSITION / ROLE]</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider text-slate-400 mb-1">3. KRA / control family</label>
+                        <select id="wfKra" onchange="wfKraChanged()" class="w-full bg-navy-950 border border-navy-700 rounded-lg px-3 py-2.5 text-xs text-white"></select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider text-slate-400 mb-1">4. KPI / item focus</label>
+                        <select id="wfKpi" onchange="wfKpiChanged()" class="w-full bg-navy-950 border border-navy-700 rounded-lg px-3 py-2.5 text-xs text-white"></select>
+                    </div>
+                </div>
+
+                <!-- Context banner -->
+                <div id="wfContext" class="mt-4 p-4 rounded-xl bg-navy-950/80 border border-amberGold-500/20">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div><div class="text-[9px] uppercase text-slate-500">Focus</div><div id="wfFocus" class="text-xs text-white font-semibold mt-1">—</div></div>
+                        <div><div class="text-[9px] uppercase text-slate-500">Role</div><div id="wfRoleOut" class="text-xs text-amberGold-400 font-semibold mt-1">—</div></div>
+                        <div><div class="text-[9px] uppercase text-slate-500">KRA</div><div id="wfKraOut" class="text-xs text-slate-300 mt-1">—</div></div>
+                        <div><div class="text-[9px] uppercase text-slate-500">Status</div><div id="wfStatus" class="text-xs text-emeraldCustom-500 font-mono font-bold mt-1">STEP 1 / 6</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workflow rail -->
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-2" id="wfSteps">
+                <button onclick="wfGo(1)" class="wf-step active p-3 rounded-xl border border-amberGold-500/50 bg-amberGold-500/10 text-left"><div class="text-[9px] font-mono text-amberGold-400">01</div><div class="text-[11px] font-bold text-white mt-1">Scope</div></button>
+                <button onclick="wfGo(2)" class="wf-step p-3 rounded-xl border border-navy-700 bg-navy-800/60 text-left"><div class="text-[9px] font-mono text-slate-500">02</div><div class="text-[11px] font-bold text-slate-300 mt-1">Define</div></button>
+                <button onclick="wfGo(3)" class="wf-step p-3 rounded-xl border border-navy-700 bg-navy-800/60 text-left"><div class="text-[9px] font-mono text-slate-500">03</div><div class="text-[11px] font-bold text-slate-300 mt-1">Evidence</div></button>
+                <button onclick="wfGo(4)" class="wf-step p-3 rounded-xl border border-navy-700 bg-navy-800/60 text-left"><div class="text-[9px] font-mono text-slate-500">04</div><div class="text-[11px] font-bold text-slate-300 mt-1">Review</div></button>
+                <button onclick="wfGo(5)" class="wf-step p-3 rounded-xl border border-navy-700 bg-navy-800/60 text-left"><div class="text-[9px] font-mono text-slate-500">05</div><div class="text-[11px] font-bold text-slate-300 mt-1">Authorize</div></button>
+                <button onclick="wfGo(6)" class="wf-step p-3 rounded-xl border border-navy-700 bg-navy-800/60 text-left"><div class="text-[9px] font-mono text-slate-500">06</div><div class="text-[11px] font-bold text-slate-300 mt-1">Close</div></button>
+            </div>
+
+            <!-- Forms -->
+            <div class="grid grid-cols-1 xl:grid-cols-5 gap-6">
+                <div class="xl:col-span-3 bg-navy-800/80 border border-navy-700 rounded-xl p-6">
+                    <div class="flex items-center justify-between border-b border-navy-700 pb-4">
+                        <div>
+                            <h3 id="wfFormTitle" class="text-sm font-bold text-white">Step 01 — Scope the item</h3>
+                            <p id="wfFormHint" class="text-[10px] text-slate-400 mt-1">Establish what is being controlled and why.</p>
+                        </div>
+                        <span id="wfStepBadge" class="text-[10px] font-mono px-2 py-1 rounded bg-navy-950 text-amberGold-400 border border-navy-700">WF-01</span>
+                    </div>
+                    <div id="wfForm" class="mt-5 space-y-4"></div>
+                    <div class="mt-6 flex justify-between gap-3">
+                        <button onclick="wfPrev()" class="px-4 py-2 rounded-lg bg-navy-700 border border-navy-600 text-xs text-slate-300">Back</button>
+                        <div class="flex gap-2">
+                            <button onclick="wfSaveDraft()" class="px-4 py-2 rounded-lg bg-navy-950 border border-navy-700 text-xs text-slate-300">Save Draft</button>
+                            <button onclick="wfNext()" class="px-5 py-2 rounded-lg bg-amberGold-500 text-navy-950 font-bold text-xs">Next Step <i class="fa-solid fa-arrow-right ml-1"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live record -->
+                <div class="xl:col-span-2 bg-navy-800/80 border border-navy-700 rounded-xl p-6">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-file-lines text-amberGold-400"></i> Workflow Record</h3>
+                    <p class="text-[10px] text-slate-400 mt-1">Placeholder-driven record that can later map directly to an Excel row or database record.</p>
+                    <div class="mt-4 overflow-x-auto">
+                        <table class="w-full text-left text-[10px]">
+                            <thead class="bg-navy-950 text-slate-500 uppercase font-mono">
+                                <tr><th class="p-2">Field</th><th class="p-2">Value / Placeholder</th></tr>
+                            </thead>
+                            <tbody id="wfRecordTable" class="divide-y divide-navy-700/60"></tbody>
+                        </table>
+                    </div>
+                    <div class="mt-5 p-3 rounded-lg bg-navy-950 border border-navy-700">
+                        <div class="text-[9px] uppercase tracking-wider text-slate-500">Completion Gate</div>
+                        <div id="wfGate" class="text-xs text-amberGold-400 font-semibold mt-1">INCOMPLETE — required evidence not yet recorded.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Templates -->
+            <div class="bg-navy-800/80 border border-navy-700 rounded-xl p-6">
+                <div class="flex items-center justify-between border-b border-navy-700 pb-4">
+                    <div>
+                        <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-table-columns text-amberGold-400 mr-2"></i>Row & Column Templates</h3>
+                        <p class="text-[10px] text-slate-400 mt-1">The same structure can be used for Excel, forms, audit logs, or a future database.</p>
+                    </div>
+                    <button onclick="wfAddTemplateRow()" class="px-3 py-1.5 rounded-lg bg-navy-700 border border-navy-600 text-[10px] text-slate-200">+ Add Template Row</button>
+                </div>
+                <div class="mt-4 overflow-x-auto">
+                    <table class="w-full text-left text-[10px]">
+                        <thead class="bg-navy-950 text-slate-400 font-mono uppercase">
+                            <tr>
+                                <th class="p-2">Record ID</th><th class="p-2">Position</th><th class="p-2">KRA</th><th class="p-2">KPI / Item</th>
+                                <th class="p-2">Target</th><th class="p-2">Actual</th><th class="p-2">Evidence Ref.</th><th class="p-2">Control / Owner</th>
+                                <th class="p-2">Review</th><th class="p-2">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="wfTemplateBody" class="divide-y divide-navy-700/60 font-mono">
+                            <tr><td class="p-2 text-amberGold-400">[WF-0001]</td><td class="p-2">[POSITION]</td><td class="p-2">[KRA]</td><td class="p-2">[KPI]</td><td class="p-2">[TARGET]</td><td class="p-2">[ACTUAL]</td><td class="p-2">[EVIDENCE]</td><td class="p-2">[CONTROL OWNER]</td><td class="p-2">[REVIEW]</td><td class="p-2 text-amberGold-400">[OPEN]</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-5 grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="p-3 rounded-lg bg-navy-950 border border-navy-700"><div class="text-[9px] uppercase text-slate-500">Input rule</div><div class="text-[11px] text-slate-300 mt-1">[DEFINE] → [TARGET] → [ACTUAL]</div></div>
+                    <div class="p-3 rounded-lg bg-navy-950 border border-navy-700"><div class="text-[9px] uppercase text-slate-500">Evidence rule</div><div class="text-[11px] text-slate-300 mt-1">[ACTUAL] + [EVIDENCE REF.] required</div></div>
+                    <div class="p-3 rounded-lg bg-navy-950 border border-navy-700"><div class="text-[9px] uppercase text-slate-500">Closure rule</div><div class="text-[11px] text-slate-300 mt-1">[REVIEW] → [AUTHORIZATION] → [CLOSED]</div></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Personnel Scope & Detail Modal -->
+    <div id="staffModal" class="fixed inset-0 bg-navy-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-navy-900 border border-navy-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-start justify-between border-b border-navy-800 pb-3">
+                <div class="flex items-center space-x-3">
+                    <div id="modalAvatar" class="w-12 h-12 rounded-xl bg-amberGold-500/20 text-amberGold-400 flex items-center justify-center font-bold text-base">
+                        --
+                    </div>
+                    <div>
+                        <h3 id="modalName" class="text-base font-bold text-white">Staff Member</h3>
+                        <p id="modalRole" class="text-xs text-amberGold-400">Role Title</p>
+                    </div>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <span class="text-slate-400 font-medium">Organizational Governance Tier:</span>
+                    <div id="modalTier" class="text-slate-200 font-semibold mt-0.5">Tier Name</div>
+                </div>
+
+                <div>
+                    <span class="text-slate-400 font-medium">Core Strategic Scope & Responsibilities:</span>
+                    <p id="modalScope" class="text-slate-300 mt-1 leading-relaxed bg-navy-950 p-3 rounded-lg border border-navy-800">
+                        Detailed scope descriptions will load here.
+                    </p>
+                </div>
+
+                <div>
+                    <span class="text-slate-400 font-medium">Primary Benchmark / KPI Target:</span>
+                    <div id="modalKpi" class="text-emeraldCustom-500 font-mono font-bold mt-1 bg-navy-950 p-2.5 rounded-lg border border-navy-800">
+                        KPI Targets
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-navy-800 flex justify-end">
+                <button onclick="closeModal()" class="px-4 py-2 bg-navy-800 hover:bg-navy-700 text-xs font-semibold text-slate-300 rounded-lg transition">
+                    Close Details
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fixed Bottom Enterprise Health Bar -->
+    <footer class="no-print bg-navy-950 border-t border-navy-800 px-4 lg:px-8 py-2.5 sticky bottom-0 z-30">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between text-[11px] gap-2">
+            <div class="flex items-center space-x-4">
+                <span class="flex items-center gap-1.5 text-slate-300">
+                    <span class="w-2 h-2 rounded-full bg-emeraldCustom-500 animate-pulse"></span>
+                    <strong>System Status:</strong> Operational
+                </span>
+                <span class="hidden sm:inline text-slate-500">|</span>
+                <span class="hidden sm:inline text-slate-400">
+                    GP Target: <strong class="text-emeraldCustom-500">≥58.86%</strong>
+                </span>
+                <span class="hidden md:inline text-slate-500">|</span>
+                <span class="hidden md:inline text-slate-400">
+                    F&B Limit: <strong class="text-amberGold-400">≤32.0%</strong>
+                </span>
+            </div>
+
+            <div class="flex items-center space-x-3 text-slate-400 font-mono text-[10px]">
+                <span>Fred's Ranch Governance Engine</span>
+                <span class="text-slate-600">&bull;</span>
+                <span>Protection Act Compliant</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Staff Directory Master Data Structure
+        const staffData = [
+            // TIER 1: BOARD OF DIRECTORS
+            {
+                id: 'fom',
+                name: 'Fred Obachi Machoka',
+                role: 'Chairman',
+                tier: 'tier1',
+                tierLabel: 'Tier 1: Strategic Apex (Board)',
+                scope: 'Supreme governance oversight, brand equity safeguard, stakeholder relations, and high-level strategic direction.',
+                kpi: 'Brand Equity, Governance Integrity & Corporate Vision'
+            },
+            {
+                id: 'sn',
+                name: 'Sophie Namuyonga',
+                role: 'Vice-Chairlady',
+                tier: 'tier1',
+                tierLabel: 'Tier 1: Strategic Apex (Board)',
+                scope: 'Ethics oversight, Internal Audit Committee leadership, governance risk review, and compliance verification.',
+                kpi: 'Audit Compliance, Zero Governance Breaches'
+            },
+            {
+                id: 'vkm',
+                name: 'Victor Keari Machoka',
+                role: 'Managing Director',
+                tier: 'tier1',
+                tierLabel: 'Tier 1: Strategic Apex (Board)',
+                scope: 'Capital expenditure approval, board target enforcement, enterprise growth strategy, and high-value decision execution.',
+                kpi: 'Enterprise Revenue KES 180M-220M, CapEx ROI'
+            },
+            {
+                id: 'aom',
+                name: 'Angel Omari Machoka',
+                role: 'Director - Brand & PR',
+                tier: 'tier1',
+                tierLabel: 'Tier 1: Strategic Apex (Board)',
+                scope: 'Brand strategy, marketing policy oversight, guest public relations, and promotional asset authorization.',
+                kpi: 'Brand Reach, CSAT Reputation Metrics'
+            },
+            {
+                id: 'som',
+                name: 'Santos Omae Machoka',
+                role: 'Director - Sales & HR',
+                tier: 'tier1',
+                tierLabel: 'Tier 1: Strategic Apex (Board)',
+                scope: 'Commercial strategy, sales channel expansion, human resource policy alignment, and workforce governance.',
+                kpi: 'Workforce Productivity, Sales Growth'
+            },
+            {
+                id: 'lm',
+                name: 'Linda Machoka',
+                role: 'Director - Legal & Statutory',
+                tier: 'tier1',
+                tierLabel: 'Tier 1: Strategic Apex (Board)',
+                scope: 'Statutory compliance, legal directive governance (LA-01), contracting, IP trade secret legal enforcement.',
+                kpi: '100% Legal Compliance & IP Protection'
+            },
+
+            // TIER 2: EXECUTIVE LEADERSHIP
+            {
+                id: 'hn',
+                name: 'Hiram Nyingi',
+                role: 'General Manager',
+                tier: 'tier2',
+                tierLabel: 'Tier 2: Executive Leadership',
+                scope: 'Day-to-day resort leadership, enterprise P&L execution, departmental alignment, and daily BSC Brief execution.',
+                kpi: 'Revenue: KES 180M-220M | EBITDA: ≥22-25%'
+            },
+            {
+                id: 'cm',
+                name: 'CPA Chris Mutinda',
+                role: 'Chief Accountant',
+                tier: 'tier2',
+                tierLabel: 'Tier 2: Executive Leadership',
+                scope: 'Financial control, daily POS audits, budget reconciliation, payroll management, and cost control enforcement.',
+                kpi: 'Audit Variance: ±2-5% | GP Target: ≥58.86%'
+            },
+            {
+                id: 'ro',
+                name: 'Reagan Ogol',
+                role: 'Operations Manager',
+                tier: 'tier2',
+                tierLabel: 'Tier 2: Executive Leadership',
+                scope: 'Operational shift logistics, F&B efficiency oversight, service quality assurance, and inter-departmental workflows.',
+                kpi: 'Efficiency Index: ≥90-95% | F&B Cost: ≤28-32%'
+            },
+            {
+                id: 'am',
+                name: 'Albert Maroa',
+                role: 'People & Culture Manager',
+                tier: 'tier2',
+                tierLabel: 'Tier 2: Executive Leadership',
+                scope: 'Talent acquisition, organizational culture index maintenance, employee discipline, and staff training.',
+                kpi: 'Staff Turnover: ≤10-12% | Culture Index: ≥90%'
+            },
+
+            // TIER 3: OPERATIONS & DEPARTMENTS
+            {
+                id: 'mabiola',
+                name: 'Mashud Abiola',
+                role: 'Accounts Receivable (AR)',
+                tier: 'tier3',
+                tierLabel: 'Tier 3: Finance & Audit',
+                scope: 'Debtor ledger management, corporate invoicing, and credit control enforcement.',
+                kpi: 'Zero Unreconciled Receivables >30 Days'
+            },
+            {
+                id: 'stonui',
+                name: 'Stanley Tonui',
+                role: 'Cashier Lead & POS Ops',
+                tier: 'tier3',
+                tierLabel: 'Tier 3: Finance & Audit',
+                scope: 'Daily POS terminal balancing, cash drop management, and shift billing accuracy.',
+                kpi: '100% Cash-to-POS Reconciliation'
+            },
+            {
+                id: 'monkoba',
+                name: 'Maclee Onkoba',
+                role: 'Store Keeper',
+                tier: 'tier3',
+                tierLabel: 'Tier 3: Finance & Audit',
+                scope: 'Store room inventory intake, raw ingredient stock control, and wastage logging.',
+                kpi: 'Stock Variance ≤1.5%'
+            },
+            {
+                id: 'ealuoch',
+                name: 'Edna Aluoch',
+                role: 'Front Office Manager (FOM)',
+                tier: 'tier3',
+                tierLabel: 'Tier 3: Front Office & Guest Experience',
+                scope: 'Guest check-ins, VIP reception management, guest CSAT monitoring, and FO staff supervision.',
+                kpi: 'CSAT Rating ≥ 92%'
+            },
+            {
+                id: 'dbarasa',
+                name: 'Deedan Barasa',
+                role: 'Night Manager',
+                tier: 'tier3',
+                tierLabel: 'Tier 3: Front Office & Guest Experience',
+                scope: 'Overnight security oversight, late night audit reconciliation, and night shift logistics.',
+                kpi: 'Night Audit Accuracy 100%'
+            },
+            {
+                id: 'lolchurie',
+                name: 'Lydia Olchurie',
+                role: 'Head Receptionist',
+                tier: 'tier3',
+                tierLabel: 'Tier 3: Front Office & Guest Experience',
+                scope: 'Reservation bookings, guest welcome protocols, and billing support.',
+                kpi: 'Check-in Speed ≤3 Minutes'
+            },
+            {
+                id: 'ssachita',
+                name: 'S. Sachita',
+                role: 'F&B Manager',
+                tier: 'tier3',
+                tierLabel: 'Tier 3: Food & Beverage Service',
+                scope: 'Dining area logistics, banquet setup, service speed, and floor staff management.',
+                kpi: 'Table Service Speed ≤15 Mins'
+            },
+            {
+                id: 'jkyalo',
+                name: 'Julius Kyalo',
+                role: 'Executive Chef',
+                tier: 'tier3',
+                tierLabel: 'Tier 3: Kitchen & Culinary Brigade',
+                scope: 'Culinary direction, menu formulation, kitchen safety protocols, and recipe quality safeguard.',
+                kpi: 'Kitchen Efficiency ≥ 95%'
+            },
+            {
+                id: 'kchepsoi',
+                name: 'Kenneth Chepsoi',
+                role: 'Head Chef',
+                tier: 'tier3',
+                tierLabel: 'Tier 3: Kitchen & Culinary Brigade',
+                scope: 'Main kitchen line management, meal prep timing, and order fulfillment quality.',
+                kpi: 'Main Order Wait Time ≤ 55 Mins'
+            },
+            {
+                id: 'bmwangi',
+                name: 'Brian Mwangi',
+                role: 'Sous Chef (Recipe Protection)',
+                tier: 'tier3',
+                tierLabel: 'Tier 3: Kitchen & Culinary Brigade',
+                scope: 'Custodian of secret Mbuzi spice formulations, marinade prep, and trade secret safeguards under Form LA-03.',
+                kpi: '100% Secret Recipe Compliance'
+            }
+        ];
+
+        function renderStaffDirectory(filter = 'all', searchQuery = '') {
+            const container = document.getElementById('staffDirectoryContainer');
+            container.innerHTML = '';
+
+            const filteredData = staffData.filter(item => {
+                const matchesFilter = (filter === 'all') || (item.tier === filter);
+                const query = searchQuery.toLowerCase();
+                const matchesSearch = !searchQuery || 
+                    item.name.toLowerCase().includes(query) || 
+                    item.role.toLowerCase().includes(query) || 
+                    item.scope.toLowerCase().includes(query) ||
+                    item.kpi.toLowerCase().includes(query);
+                
+                return matchesFilter && matchesSearch;
+            });
+
+            if (filteredData.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-slate-500">
+                        <i class="fa-solid fa-user-slash text-3xl mb-2"></i>
+                        <p class="text-xs">No matching personnel or directives found.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filteredData.forEach(person => {
+                const initials = person.name.split(' ').map(n => n[0]).slice(0, 2).join('');
+                
+                let tierBadgeClass = 'bg-navy-950 text-slate-400 border-navy-700';
+                if (person.tier === 'tier1') tierBadgeClass = 'bg-amberGold-500/10 text-amberGold-400 border-amberGold-500/30';
+                if (person.tier === 'tier2') tierBadgeClass = 'bg-blue-500/10 text-blue-400 border-blue-500/30';
+                if (person.tier === 'tier3') tierBadgeClass = 'bg-emeraldCustom-500/10 text-emeraldCustom-500 border-emeraldCustom-500/30';
+
+                const cardHtml = `
+                    <div class="bg-navy-800/80 border border-navy-700/80 hover:border-amberGold-500/50 rounded-xl p-4 flex flex-col justify-between transition group cursor-pointer"
+                         onclick="openModal('${person.id}')">
+                        <div>
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-xl bg-navy-950 border border-navy-700 text-amberGold-400 font-bold flex items-center justify-center text-xs group-hover:border-amberGold-500 transition">
+                                        ${initials}
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xs font-bold text-white group-hover:text-amberGold-400 transition">${person.name}</h3>
+                                        <p class="text-[11px] text-slate-400">${person.role}</p>
+                                    </div>
+                                </div>
+                                <span class="text-[9px] font-mono px-2 py-0.5 rounded border ${tierBadgeClass}">
+                                    ${person.tier.toUpperCase()}
+                                </span>
+                            </div>
+
+                            <p class="mt-3 text-[11px] text-slate-300 line-clamp-2">
+                                ${person.scope}
+                            </p>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-navy-700/60 flex items-center justify-between text-[10px]">
+                            <span class="text-slate-400">Target KPI:</span>
+                            <span class="font-mono text-emeraldCustom-500 font-semibold truncate ml-2">${person.kpi}</span>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        }
+
+        function openModal(id) {
+            const person = staffData.find(p => p.id === id);
+            if (!person) return;
+
+            const initials = person.name.split(' ').map(n => n[0]).slice(0, 2).join('');
+            document.getElementById('modalAvatar').innerText = initials;
+            document.getElementById('modalName').innerText = person.name;
+            document.getElementById('modalRole').innerText = person.role;
+            document.getElementById('modalTier').innerText = person.tierLabel;
+            document.getElementById('modalScope').innerText = person.scope;
+            document.getElementById('modalKpi').innerText = person.kpi;
+
+            document.getElementById('staffModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('staffModal').classList.add('hidden');
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.classList.remove('bg-amberGold-500', 'text-navy-950', 'font-semibold');
+                btn.classList.add('text-slate-400');
+            });
+
+            const activeTab = document.getElementById(tabId);
+            if (activeTab) activeTab.classList.remove('hidden');
+
+            const activeBtn = document.querySelector(`[data-tab="${tabId}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-amberGold-500', 'text-navy-950', 'font-semibold');
+                activeBtn.classList.remove('text-slate-400');
+            }
+        }
+
+        function calculateMargins() {
+            const cost = parseFloat(document.getElementById('calcCost').value) || 0;
+            const price = parseFloat(document.getElementById('calcPrice').value) || 0;
+
+            if (price <= 0) return;
+
+            const contribution = price - cost;
+            const gpMargin = (contribution / price) * 100;
+            const costRatio = (cost / price) * 100;
+
+            document.getElementById('calcGpResult').innerText = gpMargin.toFixed(2) + '%';
+            document.getElementById('calcCostRatioResult').innerText = costRatio.toFixed(2) + '%';
+            document.getElementById('calcContributionResult').innerText = 'KES ' + contribution.toLocaleString();
+
+            document.getElementById('calcGpLabel').innerText = gpMargin.toFixed(1) + '%';
+            document.getElementById('calcCostLabel').innerText = costRatio.toFixed(1) + '%';
+
+            document.getElementById('calcGpBar').style.width = Math.min(gpMargin, 100) + '%';
+            document.getElementById('calcCostBar').style.width = Math.min(costRatio, 100) + '%';
+
+            const statusBadge = document.getElementById('calcStatusBadge');
+            
+            // Check targets: GP >= 58.86% and Cost <= 32%
+            if (gpMargin >= 58.86 && costRatio <= 32.0) {
+                statusBadge.className = 'px-2.5 py-1 text-xs rounded-full font-bold bg-emeraldCustom-500/20 text-emeraldCustom-500 border border-emeraldCustom-500/30';
+                statusBadge.innerText = 'COMPLIANT WITH BOARD TARGETS';
+            } else {
+                statusBadge.className = 'px-2.5 py-1 text-xs rounded-full font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30';
+                statusBadge.innerText = 'REQUIRES LA-01 BOARD APPROVAL';
+            }
+        }
+
+        function generateDirective() {
+            const ref = document.getElementById('laRef').value;
+            const subject = document.getElementById('laSubject').value;
+            const director = document.getElementById('laDirector').value;
+            const dept = document.getElementById('laDept').value;
+            const details = document.getElementById('laDetails').value;
+
+            document.getElementById('previewRef').innerText = ref;
+            document.getElementById('previewSubject').innerText = subject;
+            document.getElementById('previewDirector').innerText = director;
+            document.getElementById('previewDept').innerText = dept;
+            document.getElementById('previewDetails').innerText = details;
+
+            // Generate pseudo SHA256 Hash
+            const fakeHash = Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+            document.getElementById('previewHash').innerText = fakeHash;
+        }
+
+        function copyDirectiveText() {
+            const text = document.getElementById('directivePreviewSheet').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Directive text copied to clipboard!');
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('Directive copied to clipboard!');
+            });
+        }
+
+
+        /* ============================================================
+           PERFORMANCE WORKFLOW STUDIO
+           Role-based; placeholder-driven; evidence-gated.
+           Source structure follows the supplied FRR 2026 scorecards:
+           KRA / Weight / Actual / KPI / Method / Target / Mechanism.
+           ============================================================ */
+        const wfData = {
+            bsc: {
+                kra: {
+                    "Financial Stewardship": [
+                        ["Achievement of Gross Revenue (top line)", "As per Approved July - Dec 2026 Budget"],
+                        ["Achievement of Cost targets", "As per Approved July to Dec 2026 Budget"],
+                        ["Inventory Management", "As per Approved Annual Inventory Budget and repair and maintenance Budget"],
+                        ["Revenue Growth", "As per Approved July to Dec 2026 Budget"]
+                    ],
+                    "Systems & Structures": [
+                        ["OPERA PMS & POS Rollout Success", "100% implementation completion of OPERA Roll-out Schedule by 30th July 2026"],
+                        ["Systems Integration", "As per System Adoption Score"],
+                        ["Compliance to Standard Operating Procedures", "As per Company Compliance Audit Score"],
+                        ["Operational Consistency and Quality Control", "As per Checklist Excellence Scores"],
+                        ["Executive Reporting Diligence", "100% compliance with Executive Reporting Checklist"]
+                    ],
+                    "SHIELD Culture Adoption": [
+                        ["Workplace Culture & Staff Climate Score", "As per Monthly Employee surveys"],
+                        ["SHIELD Culture Adoption Index", "Completion of SHIELD Action Plan"],
+                        ["Workplace Safety & Conduct", "Completion of OSH Checklist of policies"]
+                    ],
+                    "Guest Experience & Brand Reputation": [
+                        ["Guest Satisfaction Index", "As per Guest Satisfaction Index"],
+                        ["Brand Development", "As per Digital Media Engagement Target Performance"],
+                        ["Complaint Resolution", "Compliance to Complaint resolution SOPs"]
+                    ]
+                }
+            },
+            sop: {kra: {"Systems & Structures":[["SOP Compliance Control","As per Company Compliance Audit Score"],["Statutory Compliance","As per Statutory Compliance audit score"],["System Adoption","As per Systems Adoption Index"]]}},
+            audit: {kra: {"Operational Audit":[["Audit completion","As per Audit Checklist"],["Audit report timeliness","Within approved timeline"],["Corrective action closure","[TARGET / SLA]"]]}},
+            incident: {kra: {"Safety / Service Control":[["Incident classification","[INCIDENT STANDARD]"],["Corrective action","[ACTION PLAN]"],["Closure","[VERIFIED CLOSURE]"]]}},
+            menu: {kra: {"Menu Item / Recipe Margin":[["Gross Profit Margin","≥ 58.86%"],["F&B Cost Ratio","≤ 28% - 32%"],["Contribution Margin","[PRICE - COST]"]]}},
+            directive: {kra: {"Governance / Legal":[["Directive authority","[AUTHORIZED SIGNATORY]"],["Mandate conditions","[CONDITIONS]"],["Implementation confirmation","[EVIDENCE OF IMPLEMENTATION]"]]}}
+        };
+
+        let wfStep = 1;
+        let wfDraft = {};
+        const wfStepMeta = {
+            1:{title:"Step 01 — Scope the item",hint:"Establish what is being controlled and why.",code:"WF-01"},
+            2:{title:"Step 02 — Define the control",hint:"Translate the selected KPI/item into a measurable record.",code:"WF-02"},
+            3:{title:"Step 03 — Record actual & evidence",hint:"No result is complete without an evidence reference.",code:"WF-03"},
+            4:{title:"Step 04 — Review the result",hint:"Compare target, actual, variance and managerial control.",code:"WF-04"},
+            5:{title:"Step 05 — Authorize / escalate",hint:"Record the accountable authority and required decision.",code:"WF-05"},
+            6:{title:"Step 06 — Close & institutionalize",hint:"Capture the lesson, corrective action and closure status.",code:"WF-06"}
+        };
+
+        function wfOptionsForMenu(){
+            const menu=document.getElementById('wfMenu').value;
+            const role=document.getElementById('wfRole').value;
+            const source=wfData[menu]||wfData.bsc;
+            const kraEl=document.getElementById('wfKra');
+            const kpis=Object.keys(source.kra);
+            kraEl.innerHTML=kpis.map(k=>`<option value="${k}">${k}</option>`).join('');
+            wfKraChanged();
+            document.getElementById('wfFocus').innerText = menu.toUpperCase() + " / " + role;
+        }
+        function wfKraChanged(){
+            const menu=document.getElementById('wfMenu').value;
+            const kra=document.getElementById('wfKra').value;
+            const items=(wfData[menu]||wfData.bsc).kra[kra]||[];
+            const kpiEl=document.getElementById('wfKpi');
+            kpiEl.innerHTML=items.map(x=>`<option value="${x[0]}" data-target="${x[1].replace(/"/g,'&quot;')}">${x[0]}</option>`).join('');
+            wfKpiChanged();
+        }
+        function wfKpiChanged(){
+            const k=document.getElementById('wfKpi');
+            const target=k.options[k.selectedIndex]?.dataset.target||"[TARGET]";
+            wfDraft.target=target;
+            wfDraft.kpi=k.value||"[KPI]";
+            wfDraft.kra=document.getElementById('wfKra').value||"[KRA]";
+            wfDraft.role=document.getElementById('wfRole').value||"[POSITION]";
+            document.getElementById('wfRoleOut').innerText=wfDraft.role;
+            document.getElementById('wfKraOut').innerText=wfDraft.kra;
+            wfRender();
+        }
+        function wfMenuChanged(){ wfOptionsForMenu(); wfStep=1; wfRender(); }
+        function wfRoleChanged(){ wfDraft.role=document.getElementById('wfRole').value; wfRender(); }
+        function wfRender(){
+            const meta=wfStepMeta[wfStep];
+            document.getElementById('wfFormTitle').innerText=meta.title;
+            document.getElementById('wfFormHint').innerText=meta.hint;
+            document.getElementById('wfStepBadge').innerText=meta.code;
+            document.getElementById('wfStatus').innerText=`STEP ${wfStep} / 6`;
+            const forms={
+                1:[
+                    ["Record ID","wfId","[WF-YYYY-NNNN]"],["Business purpose","wfPurpose","[WHY THIS ITEM MATTERS]"],
+                    ["Control boundary","wfBoundary","[WHAT IS INCLUDED / EXCLUDED]"],["Reporting period","wfPeriod","1st July 2026 - 31st December 2026"]
+                ],
+                2:[
+                    ["KPI / item definition","wfDef","[WHAT EXACTLY IS MEASURED]"],["Measurement methodology","wfMethod","[HOW IT IS CALCULATED / OBSERVED]"],
+                    ["Target","wfTarget",wfDraft.target||"[TARGET]"],["Control owner","wfOwner",wfDraft.role||"[POSITION]"],["Rolls Up To","wfRollup","[MANAGER KPI / ENTERPRISE OBJECTIVE]"]
+                ],
+                3:[
+                    ["Actual result","wfActual","[ACTUAL]"],["Evidence reference","wfEvidence","[FILE / FORM / REPORT / AUDIT ID]"],
+                    ["Evidence date","wfEvidenceDate","[DATE]"],["Evidence verifier","wfVerifier","[POSITION / ROLE]"],["Variance / observation","wfVariance","[VARIANCE OR OBSERVATION]"]
+                ],
+                4:[
+                    ["Result status","wfReviewStatus","[ON TARGET / OFF TARGET / INCOMPLETE]"],["Managerial control test","wfControlTest","[CAUSE / COORDINATION / CONTROL / INSTITUTIONALIZATION]"],
+                    ["Corrective action required","wfCorrection","[YES / NO + ACTION]"],["Review notes","wfReviewNotes","[REVIEW COMMENT]"]
+                ],
+                5:[
+                    ["Decision","wfDecision","[ACCEPT / RETURN / ESCALATE]"],["Authorizing position","wfAuthority","[POSITION / AUTHORITY]"],
+                    ["Decision conditions","wfConditions","[CONDITIONS / LIMITS]"],["Authorization reference","wfAuthRef","[REF / SIGN-OFF ID]"]
+                ],
+                6:[
+                    ["Closure status","wfClosure","[OPEN / CLOSED / CARRIED FORWARD]"],["Institutional lesson","wfLesson","[WHAT SHOULD BECOME STANDARD PRACTICE]"],
+                    ["Corrective action closed","wfActionClosed","[YES / NO]"],["Next review date","wfNextReview","[DATE]"],["Final record reference","wfFinalRef","[ARCHIVE / FILE ID]"]
+                ]
+            };
+            const saved=wfDraft;
+            document.getElementById('wfForm').innerHTML=forms[wfStep].map(([label,id,ph])=>{
+                const val=saved[id]||"";
+                return `<div><label class="block text-[10px] font-medium text-slate-300 mb-1">${label}</label>
+                    <input id="${id}" value="${String(val).replace(/"/g,'&quot;')}" placeholder="${String(ph).replace(/"/g,'&quot;')}"
+                    class="w-full bg-navy-950 border border-navy-700 rounded-lg px-3 py-2.5 text-xs text-white focus:outline-none amber-border-glow"></div>`;
+            }).join('');
+            document.querySelectorAll('.wf-step').forEach((b,i)=>{
+                const active=i+1===wfStep;
+                b.classList.toggle('border-amberGold-500/50',active);
+                b.classList.toggle('bg-amberGold-500/10',active);
+                b.classList.toggle('border-navy-700',!active);
+                b.classList.toggle('bg-navy-800/60',!active);
+            });
+            wfRecord();
+        }
+        function wfCapture(){
+            document.querySelectorAll('#wfForm input').forEach(el=>wfDraft[el.id]=el.value);
+        }
+        function wfGo(n){ wfCapture(); wfStep=Math.max(1,Math.min(6,n)); wfRender(); }
+        function wfNext(){ wfCapture(); if(wfStep<6) wfStep++; wfRender(); }
+        function wfPrev(){ wfCapture(); if(wfStep>1) wfStep--; wfRender(); }
+        function wfSaveDraft(){ wfCapture(); wfRecord(); alert("Workflow draft captured in the current browser session."); }
+        function wfRecord(){
+            const rows=[
+                ["Record ID",wfDraft.wfId||"[WF-YYYY-NNNN]"],["Position",wfDraft.role||"[POSITION]"],
+                ["KRA",wfDraft.kra||"[KRA]"],["KPI / Item",wfDraft.kpi||"[KPI]"],["Target",wfDraft.target||"[TARGET]"],
+                ["Actual",wfDraft.wfActual||"[ACTUAL]"],["Evidence",wfDraft.wfEvidence||"[EVIDENCE REF.]"],
+                ["Control owner",wfDraft.wfOwner||wfDraft.role||"[POSITION]"],["Rolls Up To",wfDraft.wfRollup||"[MANAGER KPI]"],
+                ["Review",wfDraft.wfReviewStatus||"[REVIEW]"],["Authorization",wfDraft.wfAuthRef||"[AUTH REF.]"],
+                ["Closure",wfDraft.wfClosure||"[OPEN / CLOSED]"]
+            ];
+            document.getElementById('wfRecordTable').innerHTML=rows.map(r=>`<tr><td class="p-2 text-slate-500">${r[0]}</td><td class="p-2 text-slate-200">${r[1]}</td></tr>`).join('');
+            const complete=wfDraft.wfActual && wfDraft.wfEvidence && wfDraft.wfClosure==="CLOSED";
+            document.getElementById('wfGate').innerText=complete ? "COMPLETE — actual, evidence and closure are present." : "INCOMPLETE — required evidence / review / closure is still missing.";
+            document.getElementById('wfGate').className=complete ? "text-xs text-emeraldCustom-500 font-semibold mt-1":"text-xs text-amberGold-400 font-semibold mt-1";
+        }
+        function wfAddTemplateRow(){
+            const tr=document.createElement('tr');
+            tr.innerHTML=`<td class="p-2 text-amberGold-400">[WF-NNNN]</td><td class="p-2">[POSITION]</td><td class="p-2">[KRA]</td><td class="p-2">[KPI]</td><td class="p-2">[TARGET]</td><td class="p-2">[ACTUAL]</td><td class="p-2">[EVIDENCE]</td><td class="p-2">[CONTROL OWNER]</td><td class="p-2">[REVIEW]</td><td class="p-2 text-amberGold-400">[OPEN]</td>`;
+            document.getElementById('wfTemplateBody').appendChild(tr);
+        }
+
+        // Initialize Application Listeners
+        window.onload = function() {
+            renderStaffDirectory();
+            wfOptionsForMenu();
+
+            // Tab Event Listeners
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    switchTab(this.getAttribute('data-tab'));
+                });
+            });
+
+            // Directory Filter Listeners
+            document.querySelectorAll('.tier-filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.tier-filter-btn').forEach(b => {
+                        b.classList.remove('bg-amberGold-500', 'text-navy-950', 'font-semibold');
+                        b.classList.add('bg-navy-950', 'text-slate-300');
+                    });
+                    this.classList.add('bg-amberGold-500', 'text-navy-950', 'font-semibold');
+                    this.classList.remove('bg-navy-950', 'text-slate-300');
+
+                    const filter = this.getAttribute('data-filter');
+                    renderStaffDirectory(filter, document.getElementById('globalSearchInput').value);
+                });
+            });
+
+            // Global Search Bar Listener
+            document.getElementById('globalSearchInput').addEventListener('input', function(e) {
+                const query = e.target.value;
+                const activeFilterBtn = document.querySelector('.tier-filter-btn.bg-amberGold-500');
+                const filter = activeFilterBtn ? activeFilterBtn.getAttribute('data-filter') : 'all';
+                renderStaffDirectory(filter, query);
+            });
+
+            // Mobile Navigation Toggle
+            document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+                const nav = document.querySelector('nav');
+                nav.classList.toggle('hidden');
+            });
+        };
+    </script>
+</body>
+</html>
